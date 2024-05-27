@@ -57,22 +57,42 @@ async function getCameraStream() {
     decreaseColorTempButton.addEventListener('click', () => adjustBrightness(-10));
     capturePhotoButton.addEventListener('click', capturePhoto);
   }
-  
   function adjustZoom(step) {
     if (capabilities.zoom) {
-      const newZoom = Math.min(Math.max(settings.zoom + step, capabilities.zoom.min), capabilities.zoom.max);
-      videoTrack.applyConstraints({ advanced: [{ zoom: newZoom }] });
-      settings.zoom = newZoom;
+      const currentZoom = settings.zoom || capabilities.zoom.min;
+      const newZoom = Math.min(Math.max(currentZoom + step, capabilities.zoom.min), capabilities.zoom.max);
+      const constraints = {
+        advanced: [{ zoom: newZoom }]
+      };
+      videoTrack.applyConstraints(constraints)
+        .then(() => {
+          settings.zoom = newZoom;
+          console.log('Zoom adjusted to:', newZoom);
+        })
+        .catch((error) => {
+          console.error('Error adjusting zoom:', error);
+        });
     }
   }
   
   function adjustFocus(step) {
     if (capabilities.focusDistance) {
-      const newFocus = Math.min(Math.max(settings.focusDistance + step, capabilities.focusDistance.min), capabilities.focusDistance.max);
-      videoTrack.applyConstraints({ advanced: [{ focusDistance: newFocus }] });
-      settings.focusDistance = newFocus;
+      const currentFocus = settings.focusDistance || capabilities.focusDistance.min;
+      const newFocus = Math.min(Math.max(currentFocus + step, capabilities.focusDistance.min), capabilities.focusDistance.max);
+      const constraints = {
+        advanced: [{ focusDistance: newFocus }]
+      };
+      videoTrack.applyConstraints(constraints)
+        .then(() => {
+          settings.focusDistance = newFocus;
+          console.log('Focus distance adjusted to:', newFocus);
+        })
+        .catch((error) => {
+          console.error('Error adjusting focus distance:', error);
+        });
     }
   }
+  
   function adjustBrightness(step) {
     if (capabilities.brightness) {
       const currentBrightness = settings.brightness || capabilities.brightness.min;
